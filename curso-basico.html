@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Curso Flutter GIS Básico - Aprende a crear aplicaciones móviles con mapas desde cero">
+    <title>Flutter GIS Básico | Curso Completo - Daniel Quisbert</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e1a;
+            --secondary-dark: #151b2d;
+            --accent-green: #39d353;
+            --accent-blue: #4A90E2;
+            --accent-purple: #8B5CF6;
+            --text-light: #ffffff;
+            --text-gray: #c9d1d9;
+            --gradient-primary: linear-gradient(135deg, #39d353 0%, #2ea043 100%);
+            --gradient-course: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--primary-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(57, 211, 83, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-green);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-course);
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .course-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+        }
+
+        .course-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            border-bottom: 1px solid rgba(57, 211, 83, 0.1);
+        }
+
+        .progress-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .progress-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .progress-percentage {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: rgba(57, 211, 83, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Tabs Navigation */
+        .tabs-nav {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(57, 211, 83, 0.2);
+        }
+
+        .tab-btn {
+            background: var(--secondary-dark);
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            color: var(--text-gray);
+            padding: 1rem 1.5rem;
+            border-radius: 12px 12px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-weight: 600;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            background: rgba(74, 144, 226, 0.1);
+            border-color: var(--accent-blue);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .tab-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .tab-btn.completed::after {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-green);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Module Content */
+        .module-header {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .module-header h2 {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .module-description {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .content-section {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(57, 211, 83, 0.1);
+        }
+
+        .content-section h3 {
+            color: var(--accent-green);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .content-section h4 {
+            color: var(--accent-blue);
+            font-size: 1.2rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .content-section p {
+            color: var(--text-gray);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .content-section li {
+            color: var(--text-gray);
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .content-section li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        /* Code Examples */
+        .code-block {
+            background: #1a1f2e;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: #e6edf3;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .code-comment {
+            color: #8b949e;
+        }
+
+        .code-keyword {
+            color: #ff7b72;
+        }
+
+        .code-string {
+            color: #a5d6ff;
+        }
+
+        .code-number {
+            color: #79c0ff;
+        }
+
+        /* Example Box */
+        .example-box {
+            background: rgba(57, 211, 83, 0.05);
+            border-left: 4px solid var(--accent-green);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .example-box h4 {
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+        }
+
+        /* Analogy Box */
+        .analogy-box {
+            background: rgba(139, 92, 246, 0.05);
+            border-left: 4px solid var(--accent-purple);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .analogy-box h4 {
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+        }
+
+        /* Important Note */
+        .note-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .note-box strong {
+            color: #F59E0B;
+        }
+
+        /* Complete Module Button */
+        .complete-btn {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem auto;
+            max-width: 300px;
+        }
+
+        .complete-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(57, 211, 83, 0.3);
+        }
+
+        .complete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            background: var(--secondary-dark);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .pricing-badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .price-comparison {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .old-price {
+            font-size: 2rem;
+            color: var(--text-gray);
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .new-price {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .discount-badge {
+            background: #F59E0B;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .value-list {
+            max-width: 600px;
+            margin: 2rem auto;
+            text-align: left;
+        }
+
+        .value-list li {
+            padding: 0.8rem 0;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .value-list li::before {
+            content: '✓';
+            background: var(--accent-green);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .cta-pricing {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .cta-pricing:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(57, 211, 83, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(57, 211, 83, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-logo {
+            max-height: 60px;
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-logo:hover {
+            opacity: 1;
+        }
+
+        footer p {
+            color: var(--text-gray);
+            margin: 0.5rem 0;
+        }
+
+        /* Quiz Modal */
+        .quiz-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 26, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .quiz-modal {
+            background: var(--secondary-dark);
+            border: 2px solid var(--accent-blue);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .quiz-modal h3 {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .quiz-question {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            background: rgba(74, 144, 226, 0.1);
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            padding: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-light);
+            text-align: left;
+        }
+
+        .quiz-option:hover {
+            background: rgba(74, 144, 226, 0.2);
+            border-color: var(--accent-blue);
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: rgba(57, 211, 83, 0.2);
+            border-color: var(--accent-green);
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: #ff6b6b;
+        }
+
+        .quiz-feedback {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(57, 211, 83, 0.2);
+            color: var(--accent-green);
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .tabs-nav {
+                gap: 0.3rem;
+            }
+
+            .tab-btn {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .module-header, .content-section {
+                padding: 1.5rem;
+            }
+
+            .code-block {
+                padding: 1rem;
+            }
+
+            .quiz-modal {
+                padding: 2rem;
+            }
+
+            .price-comparison {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Daniel Quisbert</a>
+            <a href="index.html#cursos" class="nav-link">← Volver a Cursos</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="course-badge">🌱 Nivel Inicial</div>
+            <h1>Flutter GIS Básico</h1>
+            <p class="hero-subtitle">Tu primer paso hacia el desarrollo de aplicaciones móviles con mapas y tecnología geoespacial</p>
+            <div class="course-meta">
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span>6 semanas</span>
+                </div>
+                <div class="meta-item">
+                    <span>⏱️</span>
+                    <span>26 horas</span>
+                </div>
+                <div class="meta-item">
+                    <span>📱</span>
+                    <span>100% Práctico</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+        <div class="progress-container">
+            <div class="progress-header">
+                <span class="progress-title">Tu Progreso en el Curso</span>
+                <span class="progress-percentage" id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Tabs Navigation -->
+        <div class="tabs-nav" id="tabs-nav">
+            <button class="tab-btn active" data-module="1">
+                <span>📌</span> Módulo 1: Fundamentos Dart
+            </button>
+            <button class="tab-btn locked" data-module="2">
+                <span>🔒</span> Módulo 2: Flutter GIS
+            </button>
+            <button class="tab-btn locked" data-module="3">
+                <span>🔒</span> Módulo 3: Geolocalización
+            </button>
+            <button class="tab-btn locked" data-module="4">
+                <span>🔒</span> Módulo 4: Almacenamiento
+            </button>
+            <button class="tab-btn locked" data-module="5">
+                <span>🔒</span> Módulo 5: Proyecto Final
+            </button>
+        </div>
+
+        <!-- Module 1: Fundamentos Dart -->
+        <div class="tab-content active" id="module-1">
+            <div class="module-header">
+                <h2>📌 Módulo 1: Fundamentos Dart para GIS</h2>
+                <p class="module-description">
+                    Aprende los fundamentos del lenguaje Dart aplicados al mundo geoespacial. Entenderás cómo representar datos geográficos en código, manejar coordenadas y crear la base sólida para tus aplicaciones GIS.
+                </p>
+            </div>
+
+            <div class="content-section">
+                <h3>🎯 ¿Qué es Dart y por qué es perfecto para GIS?</h3>
+                
+                <div class="analogy-box">
+                    <h4>💡 Piensa en esto:</h4>
+                    <p>
+                        Dart es como el idioma que usarás para hablarle a tu teléfono y decirle: "Aquí está una coordenada, ahora muéstrala en el mapa". Es un lenguaje moderno, rápido y fácil de aprender, creado por Google específicamente para construir aplicaciones multiplataforma.
+                    </p>
+                    <p>
+                        Si has trabajado con datos geográficos en Python o JavaScript, te sentirás como en casa. Dart tiene una sintaxis clara y es especialmente bueno para manejar datos estructurados como coordenadas, puntos, líneas y polígonos.
+                    </p>
+                </div>
+
+                <h4>🔹 Variables y Tipos de Datos Geoespaciales</h4>
+                <p>
+                    En el mundo GIS, constantemente trabajamos con números (coordenadas, elevaciones, distancias) y texto (nombres de lugares, descripciones). Dart nos da herramientas perfectas para esto.
+                </p>
+
+                <div class="example-box">
+                    <h4>📍 Ejemplo Práctico: Almacenando una Ubicación</h4>
+                    <p>Imagina que quieres guardar la ubicación de La Paz, Bolivia:</p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Código Dart</div>
+                    <pre><code><span class="code-comment">// Variables para coordenadas</span>
+<span class="code-keyword">double</span> latitud = <span class="code-number">-16.5000</span>;  <span class="code-comment">// Latitud de La Paz</span>
+<span class="code-keyword">double</span> longitud = <span class="code-number">-68.1500</span>; <span class="code-comment">// Longitud de La Paz</span>
+<span class="code-keyword">String</span> nombreCiudad = <span class="code-string">"La Paz"</span>;
+<span class="code-keyword">int</span> altitud = <span class="code-number">3640</span>; <span class="code-comment">// metros sobre el nivel del mar</span>
+
+<span class="code-comment">// Ahora puedes usar estas variables</span>
+print(<span class="code-string">"Ciudad: <span class="code-keyword">$</span>nombreCiudad"</span>);
+print(<span class="code-string">"Ubicación: <span class="code-keyword">$</span>latitud, <span class="code-keyword">$</span>longitud"</span>);
+print(<span class="code-string">"Altitud: <span class="code-keyword">$</span>altitud m.s.n.m."</span>);</code></pre>
+                </div>
+
+                <div class="note-box">
+                    <p><strong>💡 Nota Importante:</strong> ¿Ves el símbolo <code>$</code> antes de las variables? Eso se llama "interpolación de strings" y es una forma elegante de insertar valores dentro de texto. ¡Mucho más limpio que concatenar con <code>+</code>!</p>
+                </div>
+
+                <h4>🔹 Listas: Colecciones de Puntos</h4>
+                <p>
+                    Cuando trabajas con rutas, polígonos o múltiples ubicaciones, necesitas listas. Piensa en una lista como una caja que puede guardar varios elementos del mismo tipo.
+                </p>
+
+                <div class="example-box">
+                    <h4>🗺️ Ejemplo: Ruta de Levantamiento Topográfico</h4>
+                    <p>Imagina que estás haciendo un levantamiento y necesitas guardar varios puntos GPS:</p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Lista de Coordenadas</div>
+                    <pre><code><span class="code-comment">// Lista de latitudes de puntos recolectados</span>
+<span class="code-keyword">List</span>&lt;<span class="code-keyword">double</span>&gt; latitudes = [
+  <span class="code-number">-16.5000</span>,
+  <span class="code-number">-16.5010</span>,
+  <span class="code-number">-16.5020</span>,
+  <span class="code-number">-16.5030</span>
+];
+
+<span class="code-comment">// Lista de longitudes correspondientes</span>
+<span class="code-keyword">List</span>&lt;<span class="code-keyword">double</span>&gt; longitudes = [
+  <span class="code-number">-68.1500</span>,
+  <span class="code-number">-68.1510</span>,
+  <span class="code-number">-68.1520</span>,
+  <span class="code-number">-68.1530</span>
+];
+
+<span class="code-comment">// Acceder al primer punto</span>
+print(<span class="code-string">"Primer punto: <span class="code-keyword">${latitudes[0]}</span>, <span class="code-keyword">${longitudes[0]}</span>"</span>);
+
+<span class="code-comment">// ¿Cuántos puntos tenemos?</span>
+print(<span class="code-string">"Total de puntos: <span class="code-keyword">${latitudes.length}</span>"</span>);</code></pre>
+                </div>
+
+                <h4>🔹 Clases y Objetos: Modelando Datos Geográficos</h4>
+                <p>
+                    Aquí es donde Dart brilla para GIS. En lugar de tener latitud, longitud, nombre y altitud en variables separadas, podemos crear una "clase" que agrupe todo relacionado a un punto geográfico.
+                </p>
+
+                <div class="analogy-box">
+                    <h4>💡 Analogía:</h4>
+                    <p>
+                        Piensa en una clase como un "molde de galletas". Defines una vez cómo es una ubicación (tiene latitud, longitud, nombre, etc.) y luego puedes crear muchas ubicaciones diferentes usando ese molde.
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Creando una Clase Ubicacion</div>
+                    <pre><code><span class="code-keyword">class</span> Ubicacion {
+  <span class="code-comment">// Propiedades de una ubicación</span>
+  <span class="code-keyword">double</span> latitud;
+  <span class="code-keyword">double</span> longitud;
+  <span class="code-keyword">String</span> nombre;
+  <span class="code-keyword">int</span> altitud;
+  
+  <span class="code-comment">// Constructor: cómo crear una nueva ubicación</span>
+  Ubicacion({
+    <span class="code-keyword">required this</span>.latitud,
+    <span class="code-keyword">required this</span>.longitud,
+    <span class="code-keyword">required this</span>.nombre,
+    <span class="code-keyword">required this</span>.altitud,
+  });
+  
+  <span class="code-comment">// Método para mostrar la información</span>
+  <span class="code-keyword">void</span> mostrarInfo() {
+    print(<span class="code-string">"📍 <span class="code-keyword">$</span>nombre"</span>);
+    print(<span class="code-string">"   Coordenadas: <span class="code-keyword">$</span>latitud, <span class="code-keyword">$</span>longitud"</span>);
+    print(<span class="code-string">"   Altitud: <span class="code-keyword">$</span>altitud m.s.n.m."</span>);
+  }
+}
+
+<span class="code-comment">// Ahora podemos crear ubicaciones fácilmente:</span>
+<span class="code-keyword">var</span> laPaz = Ubicacion(
+  latitud: <span class="code-number">-16.5000</span>,
+  longitud: <span class="code-number">-68.1500</span>,
+  nombre: <span class="code-string">"La Paz"</span>,
+  altitud: <span class="code-number">3640</span>
+);
+
+<span class="code-keyword">var</span> sucre = Ubicacion(
+  latitud: <span class="code-number">-19.0332</span>,
+  longitud: <span class="code-number">-65.2627</span>,
+  nombre: <span class="code-string">"Sucre"</span>,
+  altitud: <span class="code-number">2810</span>
+);
+
+laPaz.mostrarInfo();
+sucre.mostrarInfo();</code></pre>
+                </div>
+
+                <div class="example-box">
+                    <h4>🎯 ¿Por qué esto es poderoso?</h4>
+                    <p>
+                        Ahora, en lugar de tener 4 variables separadas por cada ubicación, tienes UN solo objeto que contiene todo. Esto hace tu código más organizado, más fácil de leer y menos propenso a errores.
+                    </p>
+                </div>
+
+                <h4>🔹 Funciones: Cálculos Geoespaciales</h4>
+                <p>
+                    Las funciones son bloques de código reutilizables. En GIS, constantemente necesitas hacer cálculos como distancias, conversiones de unidades, o validaciones de coordenadas.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Función para Validar Coordenadas</div>
+                    <pre><code><span class="code-comment">// Función que verifica si una coordenada es válida</span>
+<span class="code-keyword">bool</span> esCoordenadasValida(<span class="code-keyword">double</span> lat, <span class="code-keyword">double</span> lng) {
+  <span class="code-comment">// Latitud debe estar entre -90 y 90</span>
+  <span class="code-comment">// Longitud debe estar entre -180 y 180</span>
+  <span class="code-keyword">if</span> (lat &lt; <span class="code-number">-90</span> || lat &gt; <span class="code-number">90</span>) {
+    <span class="code-keyword">return false</span>;
+  }
+  <span class="code-keyword">if</span> (lng &lt; <span class="code-number">-180</span> || lng &gt; <span class="code-number">180</span>) {
+    <span class="code-keyword">return false</span>;
+  }
+  <span class="code-keyword">return true</span>;
+}
+
+<span class="code-comment">// Usar la función:</span>
+<span class="code-keyword">if</span> (esCoordenadasValida(<span class="code-number">-16.5</span>, <span class="code-number">-68.15</span>)) {
+  print(<span class="code-string">"✅ Coordenadas válidas"</span>);
+} <span class="code-keyword">else</span> {
+  print(<span class="code-string">"❌ Coordenadas fuera de rango"</span>);
+}</code></pre>
+                </div>
+
+                <div class="example-box">
+                    <h4>🌍 Ejercicio Mental:</h4>
+                    <p>
+                        ¿Qué pasaría si llamamos <code>esCoordenadasValida(100, -68)</code>? ¿Y si llamamos <code>esCoordenadasValida(-16, 200)</code>? Piensa en las respuestas antes de continuar.
+                    </p>
+                </div>
+
+                <h4>🔹 Estructuras de Control en Contexto GIS</h4>
+                <p>
+                    Las estructuras de control (if, for, while) son fundamentales. Te permiten tomar decisiones y repetir tareas.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Procesando Múltiples Puntos GPS</div>
+                    <pre><code><span class="code-keyword">List</span>&lt;Ubicacion&gt; puntos = [
+  Ubicacion(latitud: <span class="code-number">-16.5</span>, longitud: <span class="code-number">-68.15</span>, nombre: <span class="code-string">"Punto 1"</span>, altitud: <span class="code-number">3500</span>),
+  Ubicacion(latitud: <span class="code-number">-16.51</span>, longitud: <span class="code-number">-68.16</span>, nombre: <span class="code-string">"Punto 2"</span>, altitud: <span class="code-number">3550</span>),
+  Ubicacion(latitud: <span class="code-number">-16.52</span>, longitud: <span class="code-number">-68.17</span>, nombre: <span class="code-string">"Punto 3"</span>, altitud: <span class="code-number">3600</span>),
+];
+
+<span class="code-comment">// Recorrer todos los puntos</span>
+<span class="code-keyword">for</span> (<span class="code-keyword">var</span> punto <span class="code-keyword">in</span> puntos) {
+  <span class="code-comment">// Verificar si está por encima de 3550 metros</span>
+  <span class="code-keyword">if</span> (punto.altitud &gt; <span class="code-number">3550</span>) {
+    print(<span class="code-string">"⚠️ <span class="code-keyword">${punto.nombre}</span> está en zona de altura considerable"</span>);
+  } <span class="code-keyword">else</span> {
+    print(<span class="code-string">"✅ <span class="code-keyword">${punto.nombre}</span> está en altura moderada"</span>);
+  }
+}</code></pre>
+                </div>
+
+                <div class="note-box">
+                    <p><strong>🚀 Lo que aprenderás en las clases en vivo:</strong></p>
+                    <ul>
+                        <li>Cálculo de distancias entre coordenadas (fórmula de Haversine)</li>
+                        <li>Conversión entre sistemas de coordenadas</li>
+                        <li>Manejo de errores y validaciones avanzadas</li>
+                        <li>Optimización de código para grandes conjuntos de datos geográficos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="completeModule(1)">
+                <span>✓</span> Marcar Módulo como Completado
+            </button>
+        </div>
+
+        <!-- Module 2: Flutter GIS -->
+        <div class="tab-content" id="module-2">
+            <div class="module-header">
+                <h2>🎨 Módulo 2: Flutter para Apps Geográficas</h2>
+                <p class="module-description">
+                    Domina los widgets de Flutter y aprende a crear interfaces intuitivas para aplicaciones GIS. Construirás pantallas que muestren mapas, listas de ubicaciones y formularios de captura de datos geográficos.
+                </p>
+            </div>
+
+            <div class="content-section">
+                <h3>🎯 ¿Qué es Flutter y por qué es ideal para apps GIS?</h3>
+                
+                <div class="analogy-box">
+                    <h4>💡 Entendiendo Flutter:</h4>
+                    <p>
+                        Flutter es como un set de Lego para construir aplicaciones. Google creó miles de "piezas" (widgets) que puedes combinar para crear cualquier interfaz. Lo mejor: escribes el código UNA vez y funciona en Android, iOS y hasta en la web.
+                    </p>
+                    <p>
+                        Para GIS, esto es perfecto porque puedes crear un mapa interactivo o un formulario de campo una sola vez, y funcionará en cualquier dispositivo de tu equipo de trabajo.
+                    </p>
+                </div>
+
+                <h4>🔹 Widgets Básicos: Los Bloques de Construcción</h4>
+                <p>
+                    Todo en Flutter es un widget. Tu pantalla es un widget, un botón es un widget, incluso el texto es un widget. Vamos a ver los más importantes para apps GIS.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Tu Primera Pantalla GIS</div>
+                    <pre><code><span class="code-keyword">import</span> <span class="code-string">'package:flutter/material.dart'</span>;
+
+<span class="code-keyword">class</span> PantallaMapa <span class="code-keyword">extends</span> StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    <span class="code-keyword">return</span> Scaffold(
+      <span class="code-comment">// Barra superior</span>
+      appBar: AppBar(
+        title: Text(<span class="code-string">'Mi App GIS'</span>),
+        backgroundColor: Colors.green,
+      ),
+      <span class="code-comment">// Contenido principal</span>
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.map, size: <span class="code-number">100</span>, color: Colors.blue),
+            SizedBox(height: <span class="code-number">20</span>),
+            Text(
+              <span class="code-string">'Bienvenido a tu App GIS'</span>,
+              style: TextStyle(fontSize: <span class="code-number">24</span>, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}</code></pre>
+                </div>
+
+                <div class="example-box">
+                    <h4>🎨 ¿Qué hace este código?</h4>
+                    <ul>
+                        <li><strong>Scaffold:</strong> Es como el "esqueleto" de tu pantalla - tiene espacio para la barra superior, el contenido y botones flotantes</li>
+                        <li><strong>AppBar:</strong> La barra verde en la parte superior con el título</li>
+                        <li><strong>Column:</strong> Apila los elementos verticalmente (uno encima del otro)</li>
+                        <li><strong>Icon & Text:</strong> Muestra un ícono de mapa y texto</li>
+                    </ul>
+                </div>
+
+                <h4>🔹 Listas de Ubicaciones: El Widget ListView</h4>
+                <p>
+                    En apps GIS, constantemente muestras listas: puntos de interés, rutas guardadas, ubicaciones favoritas. ListView es tu mejor amigo.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Lista de Puntos Recolectados</div>
+                    <pre><code><span class="code-keyword">class</span> ListaUbicaciones <span class="code-keyword">extends</span> StatelessWidget {
+  <span class="code-keyword">final</span> List&lt;Ubicacion&gt; ubicaciones = [
+    Ubicacion(latitud: <span class="code-number">-16.5</span>, longitud: <span class="code-number">-68.15</span>, nombre: <span class="code-string">"La Paz"</span>, altitud: <span class="code-number">3640</span>),
+    Ubicacion(latitud: <span class="code-number">-17.78</span>, longitud: <span class="code-number">-63.18</span>, nombre: <span class="code-string">"Santa Cruz"</span>, altitud: <span class="code-number">416</span>),
+    Ubicacion(latitud: <span class="code-number">-17.39</span>, longitud: <span class="code-number">-66.16</span>, nombre: <span class="code-string">"Cochabamba"</span>, altitud: <span class="code-number">2558</span>),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    <span class="code-keyword">return</span> ListView.builder(
+      itemCount: ubicaciones.length,
+      itemBuilder: (context, index) {
+        <span class="code-keyword">final</span> ubicacion = ubicaciones[index];
+        <span class="code-keyword">return</span> Card(
+          margin: EdgeInsets.all(<span class="code-number">8</span>),
+          child: ListTile(
+            leading: Icon(Icons.location_on, color: Colors.red, size: <span class="code-number">40</span>),
+            title: Text(ubicacion.nombre),
+            subtitle: Text(<span class="code-string">'${ubicacion.latitud}, ${ubicacion.longitud}'</span>),
+            trailing: Text(<span class="code-string">'${ubicacion.altitud}m'</span>),
+            onTap: () {
+              <span class="code-comment">// Aquí podrías navegar a ver el punto en el mapa</span>
+              print(<span class="code-string">'Seleccionado: ${ubicacion.nombre}'</span>);
+            },
+          ),
+        );
+      },
+    );
+  }
+}</code></pre>
+                </div>
+
+                <div class="analogy-box">
+                    <h4>💡 ¿Cómo funciona ListView.builder?</h4>
+                    <p>
+                        Imagina que tienes 1000 ubicaciones. Si Flutter dibujara todas a la vez, tu app se congelaría. En cambio, <code>ListView.builder</code> es "inteligente": solo dibuja las ubicaciones que ves en pantalla, y cuando haces scroll, va creando y destruyendo elementos sobre la marcha. ¡Es súper eficiente!
+                    </p>
+                </div>
+
+                <h4>🔹 Formularios de Campo: Capturando Datos Geográficos</h4>
+                <p>
+                    Cuando estás en campo recolectando datos, necesitas formularios. Flutter tiene widgets perfectos para esto.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Formulario de Captura de Punto GPS</div>
+                    <pre><code><span class="code-keyword">class</span> FormularioPuntoGPS <span class="code-keyword">extends</span> StatefulWidget {
+  @override
+  _FormularioPuntoGPSState createState() => _FormularioPuntoGPSState();
+}
+
+<span class="code-keyword">class</span> _FormularioPuntoGPSState <span class="code-keyword">extends</span> State&lt;FormularioPuntoGPS&gt; {
+  <span class="code-keyword">final</span> _formKey = GlobalKey&lt;FormState&gt;();
+  String nombre = <span class="code-string">''</span>;
+  String descripcion = <span class="code-string">''</span>;
+  
+  @override
+  Widget build(BuildContext context) {
+    <span class="code-keyword">return</span> Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            decoration: InputDecoration(
+              labelText: <span class="code-string">'Nombre del Punto'</span>,
+              icon: Icon(Icons.label),
+            ),
+            onSaved: (value) => nombre = value ?? <span class="code-string">''</span>,
+            validator: (value) {
+              <span class="code-keyword">if</span> (value == <span class="code-keyword">null</span> || value.isEmpty) {
+                <span class="code-keyword">return</span> <span class="code-string">'Por favor ingresa un nombre'</span>;
+              }
+              <span class="code-keyword">return null</span>;
+            },
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              labelText: <span class="code-string">'Descripción'</span>,
+              icon: Icon(Icons.description),
+            ),
+            maxLines: <span class="code-number">3</span>,
+            onSaved: (value) => descripcion = value ?? <span class="code-string">''</span>,
+          ),
+          SizedBox(height: <span class="code-number">20</span>),
+          ElevatedButton(
+            onPressed: () {
+              <span class="code-keyword">if</span> (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                <span class="code-comment">// Aquí guardarías el punto con las coordenadas actuales</span>
+                print(<span class="code-string">'Punto guardado: $nombre - $descripcion'</span>);
+              }
+            },
+            child: Text(<span class="code-string">'Guardar Punto GPS'</span>),
+          ),
+        ],
+      ),
+    );
+  }
+}</code></pre>
+                </div>
+
+                <div class="note-box">
+                    <p><strong>🔄 StatefulWidget vs StatelessWidget:</strong></p>
+                    <p>
+                        Un <code>StatelessWidget</code> es como una foto: no cambia. Un <code>StatefulWidget</code> es como un video: puede cambiar con el tiempo. Los formularios necesitan ser Stateful porque el texto que escribes cambia el estado de la app.
+                    </p>
+                </div>
+
+                <h4>🔹 Diseño Responsivo: Apps que se Ven Bien en Cualquier Pantalla</h4>
+                <p>
+                    Tu app la usarán en teléfonos pequeños y tablets grandes. Necesitas que se adapte automáticamente.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Layout Adaptable</div>
+                    <pre><code><span class="code-keyword">class</span> VistaAdaptable <span class="code-keyword">extends</span> StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    <span class="code-comment">// Obtener el ancho de la pantalla</span>
+    <span class="code-keyword">var</span> ancho = MediaQuery.of(context).size.width;
+    
+    <span class="code-keyword">return</span> Container(
+      padding: EdgeInsets.all(<span class="code-number">16</span>),
+      child: ancho &lt; <span class="code-number">600</span> 
+        ? <span class="code-comment">// Pantalla pequeña: una columna</span>
+          Column(
+            children: [
+              MapaThumbnail(),
+              SizedBox(height: <span class="code-number">16</span>),
+              DetallesPunto(),
+            ],
+          )
+        : <span class="code-comment">// Pantalla grande: dos columnas lado a lado</span>
+          Row(
+            children: [
+              Expanded(child: MapaThumbnail()),
+              SizedBox(width: <span class="code-number">16</span>),
+              Expanded(child: DetallesPunto()),
+            ],
+          ),
+    );
+  }
+}</code></pre>
+                </div>
+
+                <div class="example-box">
+                    <h4>📱 ¿Qué logra esto?</h4>
+                    <p>
+                        Si estás en un teléfono (menos de 600 píxeles de ancho), el mapa y los detalles aparecen uno debajo del otro. Si estás en una tablet o PC, aparecen lado a lado. ¡Todo automático!
+                    </p>
+                </div>
+
+                <h4>🔹 Navegación entre Pantallas</h4>
+                <p>
+                    Tu app GIS tendrá varias pantallas: mapa, lista de puntos, configuración. Necesitas poder navegar entre ellas.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Navegación Simple</div>
+                    <pre><code><span class="code-comment">// Ir a otra pantalla</span>
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => PantallaDetallePunto(ubicacion: ubicacionSeleccionada),
+  ),
+);
+
+<span class="code-comment">// Volver atrás</span>
+Navigator.pop(context);
+
+<span class="code-comment">// Ir a una pantalla y cerrar todas las anteriores</span>
+Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(builder: (context) => PantallaMapa()),
+);</code></pre>
+                </div>
+
+                <div class="note-box">
+                    <p><strong>🚀 En las clases en vivo profundizaremos en:</strong></p>
+                    <ul>
+                        <li>Animaciones suaves entre pantallas</li>
+                        <li>Gestión de estado con Provider o Riverpod</li>
+                        <li>Temas claros y oscuros para mejor visibilidad en campo</li>
+                        <li>Widgets personalizados para mostrar coordenadas y mapas</li>
+                        <li>Optimización de rendimiento para apps con muchos datos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="completeModule(2)">
+                <span>✓</span> Marcar Módulo como Completado
+            </button>
+        </div>
+
+        <!-- Module 3: Geolocalización -->
+        <div class="tab-content" id="module-3">
+            <div class="module-header">
+                <h2>📍 Módulo 3: Geolocalización Básica</h2>
+                <p class="module-description">
+                    Aprende a usar el GPS del dispositivo, entender sistemas de coordenadas y trabajar con ubicaciones en tiempo real. El corazón de cualquier app GIS móvil.
+                </p>
+            </div>
+
+            <div class="content-section">
+                <h3>🎯 Conceptos Fundamentales de Geolocalización</h3>
+                
+                <p>
+                    Antes de escribir código, es crucial entender qué es el GPS, cómo funciona y qué limitaciones tiene en el mundo real.
+                </p>
+
+                <div class="analogy-box">
+                    <h4>🛰️ ¿Cómo funciona el GPS?</h4>
+                    <p>
+                        Tu teléfono se comunica con al menos 4 satélites GPS en órbita. Cada satélite le dice: "Estoy aquí y son las 10:00:00.00001". Tu teléfono calcula cuánto tardó en llegar esa señal y triangula tu posición. Es como si gritaras en un valle y por el eco calcularas tu distancia a las montañas.
+                    </p>
+                    <p>
+                        <strong>Precisión típica:</strong> 5-10 metros en campo abierto. Puede ser de 20-50 metros en ciudad (efecto cañón urbano) o dentro de edificios.
+                    </p>
+                </div>
+
+                <h4>🔹 Sistemas de Coordenadas: WGS84 y UTM</h4>
+                <p>
+                    Como geodesta o geógrafo, sabes que hay múltiples formas de representar ubicaciones en la Tierra. Los dispositivos móviles usan principalmente WGS84 (el sistema del GPS).
+                </p>
+
+                <div class="example-box">
+                    <h4>🌍 Coordenadas Geográficas (WGS84)</h4>
+                    <p>El formato estándar que obtienes del GPS del teléfono:</p>
+                    <ul>
+                        <li><strong>Latitud:</strong> -90° a +90° (Sur a Norte)</li>
+                        <li><strong>Longitud:</strong> -180° a +180° (Oeste a Este)</li>
+                        <li><strong>Ejemplo:</strong> La Paz está en -16.5000°, -68.1500°</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Obteniendo la Ubicación Actual</div>
+                    <pre><code><span class="code-keyword">import</span> <span class="code-string">'package:geolocator/geolocator.dart'</span>;
+
+<span class="code-keyword">Future</span>&lt;Position&gt; obtenerUbicacionActual() <span class="code-keyword">async</span> {
+  <span class="code-comment">// 1. Verificar si el servicio de ubicación está activado</span>
+  <span class="code-keyword">bool</span> servicioActivo = <span class="code-keyword">await</span> Geolocator.isLocationServiceEnabled();
+  <span class="code-keyword">if</span> (!servicioActivo) {
+    <span class="code-keyword">throw</span> Exception(<span class="code-string">'El GPS está desactivado'</span>);
+  }
+
+  <span class="code-comment">// 2. Verificar permisos</span>
+  LocationPermission permiso = <span class="code-keyword">await</span> Geolocator.checkPermission();
+  <span class="code-keyword">if</span> (permiso == LocationPermission.denied) {
+    permiso = <span class="code-keyword">await</span> Geolocator.requestPermission();
+    <span class="code-keyword">if</span> (permiso == LocationPermission.denied) {
+      <span class="code-keyword">throw</span> Exception(<span class="code-string">'Permiso de ubicación denegado'</span>);
+    }
+  }
+
+  <span class="code-comment">// 3. Obtener la posición actual</span>
+  Position posicion = <span class="code-keyword">await</span> Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+
+  print(<span class="code-string">'📍 Ubicación obtenida:'</span>);
+  print(<span class="code-string">'   Latitud: ${posicion.latitude}'</span>);
+  print(<span class="code-string">'   Longitud: ${posicion.longitude}'</span>);
+  print(<span class="code-string">'   Precisión: ${posicion.accuracy} metros'</span>);
+  print(<span class="code-string">'   Altitud: ${posicion.altitude} metros'</span>);
+
+  <span class="code-keyword">return</span> posicion;
+}</code></pre>
+                </div>
+
+                <div class="note-box">
+                    <p><strong>⚠️ Importante sobre precisión:</strong></p>
+                    <p>
+                        <code>desiredAccuracy</code> no garantiza precisión, solo le dice al sistema qué tan duro debe trabajar. <code>LocationAccuracy.high</code> consume más batería pero intenta obtener mejor precisión. Para levantamientos profesionales, siempre verifica el valor de <code>position.accuracy</code> antes de guardar el punto.
+                    </p>
+                </div>
+
+                <h4>🔹 Seguimiento en Tiempo Real (Stream de Posiciones)</h4>
+                <p>
+                    Para apps que rastrean rutas o movimiento, necesitas actualizaciones continuas de ubicación.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Tracking de Ruta en Tiempo Real</div>
+                    <pre><code><span class="code-keyword">class</span> TrackerRuta {
+  List&lt;Position&gt; rutaRecorrida = [];
+  StreamSubscription&lt;Position&gt;? _streamPosicion;
+
+  <span class="code-comment">// Iniciar el seguimiento</span>
+  <span class="code-keyword">void</span> iniciarTracking() {
+    <span class="code-keyword">const</span> configuracion = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: <span class="code-number">10</span>, <span class="code-comment">// Solo actualizar si se movió 10 metros</span>
+    );
+
+    _streamPosicion = Geolocator.getPositionStream(
+      locationSettings: configuracion,
+    ).listen((Position posicion) {
+      <span class="code-comment">// Se ejecuta cada vez que hay nueva posición</span>
+      rutaRecorrida.add(posicion);
+      print(<span class="code-string">'🚶 Nueva posición: ${posicion.latitude}, ${posicion.longitude}'</span>);
+      print(<span class="code-string">'📏 Total de puntos: ${rutaRecorrida.length}'</span>);
+    });
+  }
+
+  <span class="code-comment">// Detener el seguimiento</span>
+  <span class="code-keyword">void</span> detenerTracking() {
+    _streamPosicion?.cancel();
+    print(<span class="code-string">'✅ Tracking detenido. Ruta con ${rutaRecorrida.length} puntos'</span>);
+  }
+
+  <span class="code-comment">// Calcular distancia total recorrida</span>
+  <span class="code-keyword">double</span> calcularDistanciaTotal() {
+    <span class="code-keyword">double</span> distanciaTotal = <span class="code-number">0</span>;
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = <span class="code-number">0</span>; i &lt; rutaRecorrida.length - <span class="code-number">1</span>; i++) {
+      distanciaTotal += Geolocator.distanceBetween(
+        rutaRecorrida[i].latitude,
+        rutaRecorrida[i].longitude,
+        rutaRecorrida[i + <span class="code-number">1</span>].latitude,
+        rutaRecorrida[i + <span class="code-number">1</span>].longitude,
+      );
+    }
+    <span class="code-keyword">return</span> distanciaTotal; <span class="code-comment">// en metros</span>
+  }
+}</code></pre>
+                </div>
+
+                <div class="example-box">
+                    <h4>🎯 Caso de Uso Real:</h4>
+                    <p>
+                        Imagina que estás haciendo un levantamiento de un sendero en un parque nacional. Activas el tracking al inicio, caminas el sendero completo, y al final tienes todos los puntos GPS guardados con timestamps. Luego puedes calcular la longitud total, velocidad promedio, y exportar a un archivo GPX o KML.
+                    </p>
+                </div>
+
+                <h4>🔹 Cálculo de Distancias: Fórmula de Haversine</h4>
+                <p>
+                    Una de las operaciones más comunes en GIS: calcular la distancia entre dos puntos sobre la superficie esférica de la Tierra.
+                </p>
+
+                <div class="analogy-box">
+                    <h4>🌍 ¿Por qué no basta con Pitágoras?</h4>
+                    <p>
+                        La Tierra no es plana (¡sorpresa!). Si calculas distancia con el teorema de Pitágoras, obtendrás errores enormes, especialmente en distancias largas o cerca de los polos. La fórmula de Haversine toma en cuenta la curvatura de la Tierra.
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Calculando Distancia Real</div>
+                    <pre><code><span class="code-comment">// Flutter incluye esto en el paquete Geolocator</span>
+<span class="code-keyword">double</span> distancia = Geolocator.distanceBetween(
+  <span class="code-number">-16.5000</span>, <span class="code-number">-68.1500</span>,  <span class="code-comment">// La Paz</span>
+  <span class="code-number">-17.7833</span>, <span class="code-number">-63.1821</span>,  <span class="code-comment">// Santa Cruz</span>
+);
+
+print(<span class="code-string">'Distancia: ${(distancia / 1000).toStringAsFixed(2)} km'</span>);
+<span class="code-comment">// Resultado: ~480 km (distancia real en línea recta)</span>
+
+<span class="code-comment">// También puedes calcular el bearing (rumbo)</span>
+<span class="code-keyword">double</span> rumbo = Geolocator.bearingBetween(
+  <span class="code-number">-16.5000</span>, <span class="code-number">-68.1500</span>,
+  <span class="code-number">-17.7833</span>, <span class="code-number">-63.1821</span>,
+);
+print(<span class="code-string">'Rumbo: ${rumbo.toStringAsFixed(1)}° (desde La Paz hacia Santa Cruz)'</span>);
+<span class="code-comment">// Resultado: ~135° (Sureste)</span></code></pre>
+                </div>
+
+                <h4>🔹 Manejo de Errores y Casos Edge</h4>
+                <p>
+                    En apps de campo, muchas cosas pueden salir mal: GPS desactivado, permisos negados, señal débil, usuario en un túnel...
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Manejo Robusto de Ubicación</div>
+                    <pre><code><span class="code-keyword">Future</span>&lt;Position?&gt; obtenerUbicacionSegura() <span class="code-keyword">async</span> {
+  <span class="code-keyword">try</span> {
+    Position posicion = <span class="code-keyword">await</span> Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+      timeLimit: Duration(seconds: <span class="code-number">10</span>), <span class="code-comment">// Timeout de 10 seg</span>
+    );
+
+    <span class="code-comment">// Validar que la precisión sea aceptable</span>
+    <span class="code-keyword">if</span> (posicion.accuracy &gt; <span class="code-number">20</span>) {
+      print(<span class="code-string">'⚠️ Advertencia: Baja precisión (${posicion.accuracy}m)'</span>);
+      <span class="code-comment">// Podrías pedirle al usuario que espere o se mueva a campo abierto</span>
+    }
+
+    <span class="code-keyword">return</span> posicion;
+
+  } <span class="code-keyword">on</span> TimeoutException {
+    print(<span class="code-string">'❌ Timeout: GPS tardó demasiado en responder'</span>);
+    <span class="code-keyword">return null</span>;
+  } <span class="code-keyword">on</span> LocationServiceDisabledException {
+    print(<span class="code-string">'❌ GPS desactivado. Pide al usuario que lo active'</span>);
+    <span class="code-keyword">return null</span>;
+  } <span class="code-keyword">on</span> PermissionDeniedException {
+    print(<span class="code-string">'❌ Permisos denegados'</span>);
+    <span class="code-keyword">return null</span>;
+  } <span class="code-keyword">catch</span> (e) {
+    print(<span class="code-string">'❌ Error desconocido: $e'</span>);
+    <span class="code-keyword">return null</span>;
+  }
+}</code></pre>
+                </div>
+
+                <div class="note-box">
+                    <p><strong>💡 Mejores Prácticas para Apps de Campo:</strong></p>
+                    <ul>
+                        <li>Siempre muestra la precisión al usuario (ej: "GPS: ±8m")</li>
+                        <li>Permite capturar múltiples lecturas y promediarlas</li>
+                        <li>Guarda metadatos: hora, precisión, proveedor (GPS vs Red)</li>
+                        <li>Ofrece modo offline: guarda coordenadas localmente</li>
+                        <li>Ten un botón para "refrescar ubicación" si la señal es mala</li>
+                    </ul>
+                </div>
+
+                <div class="example-box">
+                    <h4>🚀 Proyecto del Módulo:</h4>
+                    <p>
+                        Al final de este módulo, crearás una mini-app que:
+                    </p>
+                    <ul>
+                        <li>Muestra tu ubicación actual con precisión</li>
+                        <li>Permite guardar "waypoints" con nombre y descripción</li>
+                        <li>Calcula distancia desde tu ubicación a cada waypoint guardado</li>
+                        <li>Funciona offline y sincroniza cuando hay conexión</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="completeModule(3)">
+                <span>✓</span> Marcar Módulo como Completado
+            </button>
+        </div>
+
+        <!-- Module 4: Almacenamiento Local -->
+        <div class="tab-content" id="module-4">
+            <div class="module-header">
+                <h2>💾 Módulo 4: Almacenamiento Local de Datos Geográficos</h2>
+                <p class="module-description">
+                    Aprende a guardar datos geoespaciales en el dispositivo para que tu app funcione offline. Esencial para trabajo de campo sin conexión a internet.
+                </p>
+            </div>
+
+            <div class="content-section">
+                <h3>🎯 ¿Por qué el Almacenamiento Local es Crítico en GIS Móvil?</h3>
+                
+                <div class="analogy-box">
+                    <h4>🏔️ El Escenario Real:</h4>
+                    <p>
+                        Imagina que estás haciendo un levantamiento topográfico en las montañas de Cochabamba. No hay señal de internet. Recolectas 200 puntos GPS durante el día. Si no tienes almacenamiento local, perderías todo cuando cierres la app o se apague el teléfono. ¡Inaceptable!
+                    </p>
+                    <p>
+                        El almacenamiento local te permite guardar datos en el dispositivo y sincronizarlos con la nube cuando regreses a la civilización.
+                    </p>
+                </div>
+
+                <h4>🔹 SharedPreferences: Para Configuraciones Simples</h4>
+                <p>
+                    SharedPreferences es perfecto para guardar cosas pequeñas como preferencias del usuario, última ubicación conocida, o configuraciones de la app.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Guardar Última Ubicación</div>
+                    <pre><code><span class="code-keyword">import</span> <span class="code-string">'package:shared_preferences/shared_preferences.dart'</span>;
+
+<span class="code-keyword">class</span> PreferenciasGPS {
+  <span class="code-comment">// Guardar última ubicación</span>
+  <span class="code-keyword">static Future</span>&lt;<span class="code-keyword">void</span>&gt; guardarUltimaUbicacion(
+    <span class="code-keyword">double</span> lat, 
+    <span class="code-keyword">double</span> lng
+  ) <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> prefs = <span class="code-keyword">await</span> SharedPreferences.getInstance();
+    <span class="code-keyword">await</span> prefs.setDouble(<span class="code-string">'ultima_latitud'</span>, lat);
+    <span class="code-keyword">await</span> prefs.setDouble(<span class="code-string">'ultima_longitud'</span>, lng);
+    <span class="code-keyword">await</span> prefs.setString(<span class="code-string">'ultima_actualizacion'</span>, 
+      DateTime.now().toIso8601String());
+  }
+
+  <span class="code-comment">// Leer última ubicación</span>
+  <span class="code-keyword">static Future</span>&lt;Map&lt;String, <span class="code-keyword">dynamic</span>&gt;?&gt; obtenerUltimaUbicacion() <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> prefs = <span class="code-keyword">await</span> SharedPreferences.getInstance();
+    <span class="code-keyword">final</span> lat = prefs.getDouble(<span class="code-string">'ultima_latitud'</span>);
+    <span class="code-keyword">final</span> lng = prefs.getDouble(<span class="code-string">'ultima_longitud'</span>);
+
+    <span class="code-keyword">if</span> (lat == <span class="code-keyword">null</span> || lng == <span class="code-keyword">null</span>) {
+      <span class="code-keyword">return null</span>;
+    }
+
+    <span class="code-keyword">return</span> {
+      <span class="code-string">'latitud'</span>: lat,
+      <span class="code-string">'longitud'</span>: lng,
+      <span class="code-string">'fecha'</span>: prefs.getString(<span class="code-string">'ultima_actualizacion'</span>),
+    };
+  }
+}</code></pre>
+                </div>
+
+                <div class="example-box">
+                    <h4>📱 Caso de Uso:</h4>
+                    <p>
+                        Cuando el usuario abre tu app, en lugar de mostrar un mapa genérico del mundo, puedes centrar el mapa en su última ubicación conocida. Esto ahorra tiempo y batería.
+                    </p>
+                </div>
+
+                <h4>🔹 SQLite: Base de Datos Local para Geodatos</h4>
+                <p>
+                    Para datos más complejos (puntos GPS, rutas, polígonos), necesitas una base de datos real. SQLite es perfecta: liviana, rápida y funciona completamente offline.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Crear Base de Datos para Puntos GPS</div>
+                    <pre><code><span class="code-keyword">import</span> <span class="code-string">'package:sqflite/sqflite.dart'</span>;
+<span class="code-keyword">import</span> <span class="code-string">'package:path/path.dart'</span>;
+
+<span class="code-keyword">class</span> DatabaseGPS {
+  <span class="code-keyword">static</span> Database? _database;
+
+  <span class="code-comment">// Obtener o crear la base de datos</span>
+  <span class="code-keyword">static Future</span>&lt;Database&gt; getDatabase() <span class="code-keyword">async</span> {
+    <span class="code-keyword">if</span> (_database != <span class="code-keyword">null</span>) <span class="code-keyword">return</span> _database!;
+
+    _database = <span class="code-keyword">await</span> openDatabase(
+      join(<span class="code-keyword">await</span> getDatabasesPath(), <span class="code-string">'puntos_gps.db'</span>),
+      onCreate: (db, version) {
+        <span class="code-keyword">return</span> db.execute(
+          <span class="code-string">'''
+          CREATE TABLE puntos_gps(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            latitud REAL NOT NULL,
+            longitud REAL NOT NULL,
+            altitud REAL,
+            precision REAL,
+            descripcion TEXT,
+            fecha_captura TEXT NOT NULL,
+            sincronizado INTEGER DEFAULT 0
+          )
+          '''</span>,
+        );
+      },
+      version: <span class="code-number">1</span>,
+    );
+
+    <span class="code-keyword">return</span> _database!;
+  }
+}</code></pre>
+                </div>
+
+                <div class="analogy-box">
+                    <h4>💡 Estructura de la Tabla:</h4>
+                    <p>
+                        Piensa en una tabla como una hoja de Excel. Cada columna es un tipo de dato (nombre, latitud, etc.) y cada fila es un punto GPS que capturaste. El campo <code>sincronizado</code> es clave: marca si ya subiste ese punto a la nube o no.
+                    </p>
+                </div>
+
+                <h4>🔹 Operaciones CRUD: Guardar, Leer, Actualizar, Borrar</h4>
+                <p>
+                    Las operaciones fundamentales que harás con tus datos geográficos.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Operaciones con Puntos GPS</div>
+                    <pre><code><span class="code-keyword">class</span> PuntoGPSRepository {
+  <span class="code-comment">// CREATE: Guardar nuevo punto</span>
+  <span class="code-keyword">static Future</span>&lt;<span class="code-keyword">int</span>&gt; guardarPunto(Map&lt;String, <span class="code-keyword">dynamic</span>&gt; punto) <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> db = <span class="code-keyword">await</span> DatabaseGPS.getDatabase();
+    <span class="code-keyword">return await</span> db.insert(<span class="code-string">'puntos_gps'</span>, punto);
+  }
+
+  <span class="code-comment">// READ: Obtener todos los puntos</span>
+  <span class="code-keyword">static Future</span>&lt;List&lt;Map&lt;String, <span class="code-keyword">dynamic</span>&gt;&gt;&gt; obtenerTodosPuntos() <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> db = <span class="code-keyword">await</span> DatabaseGPS.getDatabase();
+    <span class="code-keyword">return await</span> db.query(<span class="code-string">'puntos_gps'</span>, orderBy: <span class="code-string">'fecha_captura DESC'</span>);
+  }
+
+  <span class="code-comment">// READ: Obtener puntos NO sincronizados</span>
+  <span class="code-keyword">static Future</span>&lt;List&lt;Map&lt;String, <span class="code-keyword">dynamic</span>&gt;&gt;&gt; obtenerPuntosNoSincronizados() <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> db = <span class="code-keyword">await</span> DatabaseGPS.getDatabase();
+    <span class="code-keyword">return await</span> db.query(
+      <span class="code-string">'puntos_gps'</span>,
+      where: <span class="code-string">'sincronizado = ?'</span>,
+      whereArgs: [<span class="code-number">0</span>],
+    );
+  }
+
+  <span class="code-comment">// UPDATE: Marcar punto como sincronizado</span>
+  <span class="code-keyword">static Future</span>&lt;<span class="code-keyword">int</span>&gt; marcarComoSincronizado(<span class="code-keyword">int</span> id) <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> db = <span class="code-keyword">await</span> DatabaseGPS.getDatabase();
+    <span class="code-keyword">return await</span> db.update(
+      <span class="code-string">'puntos_gps'</span>,
+      {<span class="code-string">'sincronizado'</span>: <span class="code-number">1</span>},
+      where: <span class="code-string">'id = ?'</span>,
+      whereArgs: [id],
+    );
+  }
+
+  <span class="code-comment">// DELETE: Eliminar punto</span>
+  <span class="code-keyword">static Future</span>&lt;<span class="code-keyword">int</span>&gt; eliminarPunto(<span class="code-keyword">int</span> id) <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> db = <span class="code-keyword">await</span> DatabaseGPS.getDatabase();
+    <span class="code-keyword">return await</span> db.delete(
+      <span class="code-string">'puntos_gps'</span>,
+      where: <span class="code-string">'id = ?'</span>,
+      whereArgs: [id],
+    );
+  }
+
+  <span class="code-comment">// BÚSQUEDA: Encontrar puntos cerca de una ubicación</span>
+  <span class="code-keyword">static Future</span>&lt;List&lt;Map&lt;String, <span class="code-keyword">dynamic</span>&gt;&gt;&gt; buscarPuntosCercanos(
+    <span class="code-keyword">double</span> lat, 
+    <span class="code-keyword">double</span> lng, 
+    <span class="code-keyword">double</span> radioKm
+  ) <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> db = <span class="code-keyword">await</span> DatabaseGPS.getDatabase();
+    <span class="code-keyword">final</span> puntos = <span class="code-keyword">await</span> db.query(<span class="code-string">'puntos_gps'</span>);
+    
+    <span class="code-comment">// Filtrar por distancia (simplificado)</span>
+    <span class="code-keyword">return</span> puntos.where((punto) {
+      <span class="code-keyword">final</span> distancia = Geolocator.distanceBetween(
+        lat, lng,
+        punto[<span class="code-string">'latitud'</span>] <span class="code-keyword">as double</span>,
+        punto[<span class="code-string">'longitud'</span>] <span class="code-keyword">as double</span>,
+      );
+      <span class="code-keyword">return</span> distancia &lt;= (radioKm * <span class="code-number">1000</span>);
+    }).toList();
+  }
+}</code></pre>
+                </div>
+
+                <div class="example-box">
+                    <h4>🔍 Ejemplo de Uso Real:</h4>
+                    <p>Estás en campo y capturas un punto GPS:</p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Guardar Punto en Campo</div>
+                    <pre><code><span class="code-comment">// El usuario toca el botón "Guardar Punto GPS"</span>
+<span class="code-keyword">void</span> guardarPuntoActual() <span class="code-keyword">async</span> {
+  <span class="code-comment">// 1. Obtener ubicación actual</span>
+  Position? pos = <span class="code-keyword">await</span> obtenerUbicacionSegura();
+  <span class="code-keyword">if</span> (pos == <span class="code-keyword">null</span>) {
+    print(<span class="code-string">'❌ No se pudo obtener ubicación'</span>);
+    <span class="code-keyword">return</span>;
+  }
+
+  <span class="code-comment">// 2. Crear el punto</span>
+  <span class="code-keyword">final</span> punto = {
+    <span class="code-string">'nombre'</span>: <span class="code-string">'Punto ${DateTime.now().millisecondsSinceEpoch}'</span>,
+    <span class="code-string">'latitud'</span>: pos.latitude,
+    <span class="code-string">'longitud'</span>: pos.longitude,
+    <span class="code-string">'altitud'</span>: pos.altitude,
+    <span class="code-string">'precision'</span>: pos.accuracy,
+    <span class="code-string">'descripcion'</span>: <span class="code-string">'Punto capturado en campo'</span>,
+    <span class="code-string">'fecha_captura'</span>: DateTime.now().toIso8601String(),
+    <span class="code-string">'sincronizado'</span>: <span class="code-number">0</span>, <span class="code-comment">// Aún no se subió a la nube</span>
+  };
+
+  <span class="code-comment">// 3. Guardar en SQLite</span>
+  <span class="code-keyword">int</span> id = <span class="code-keyword">await</span> PuntoGPSRepository.guardarPunto(punto);
+  print(<span class="code-string">'✅ Punto guardado con ID: $id'</span>);
+}</code></pre>
+                </div>
+
+                <h4>🔹 Consultas Espaciales Básicas</h4>
+                <p>
+                    SQLite no tiene funciones GIS nativas como PostGIS, pero podemos hacer consultas espaciales básicas con un poco de código Dart.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">📝 Estadísticas de Puntos Capturados</div>
+                    <pre><code><span class="code-keyword">class</span> EstadisticasGPS {
+  <span class="code-keyword">static Future</span>&lt;Map&lt;String, <span class="code-keyword">dynamic</span>&gt;&gt; obtenerEstadisticas() <span class="code-keyword">async</span> {
+    <span class="code-keyword">final</span> puntos = <span class="code-keyword">await</span> PuntoGPSRepository.obtenerTodosPuntos();
+
+    <span class="code-keyword">if</span> (puntos.isEmpty) {
+      <span class="code-keyword">return</span> {<span class="code-string">'total'</span>: <span class="code-number">0</span>};
+    }
+
+    <span class="code-comment">// Calcular altitud promedio</span>
+    <span class="code-keyword">double</span> altitudPromedio = puntos
+        .map((p) => p[<span class="code-string">'altitud'</span>] <span class="code-keyword">as double</span>? ?? <span class="code-number">0</span>)
+        .reduce((a, b) => a + b) / puntos.length;
+
+    <span class="code-comment">// Encontrar altitud mínima y máxima</span>
+    <span class="code-keyword">double</span> altitudMin = puntos
+        .map((p) => p[<span class="code-string">'altitud'</span>] <span class="code-keyword">as double</span>? ?? <span class="code-number">0</span>)
+        .reduce((a, b) => a &lt; b ? a : b);
+
+    <span class="code-keyword">double</span> altitudMax = puntos
+        .map((p) => p[<span class="code-string">'altitud'</span>] <span class="code-keyword">as double</span>? ?? <span class="code-number">0</span>)
+        .reduce((a, b) => a &gt; b ? a : b);
+
+    <span class="code-comment">// Contar puntos sincronizados vs no sincronizados</span>
+    <span class="code-keyword">int</span> sincronizados = puntos
+        .where((p) => p[<span class="code-string">'sincronizado'</span>] == <span class="code-number">1</span>)
+        .length;
+
+    <span class="code-keyword">return</span> {
+      <span class="code-string">'total'</span>: puntos.length,
+      <span class="code-string">'sincronizados'</span>: sincronizados,
+      <span class="code-string">'pendientes'</span>: puntos.length - sincronizados,
+      <span class="code-string">'altitud_promedio'</span>: altitudPromedio.toStringAsFixed(<span class="code-number">1</span>),
+      <span class="code-string">'altitud_minima'</span>: altitudMin.toStringAsFixed(<span class="code-number">1</span>),
+      <span class="code-string">'altitud_maxima'</span>: altitudMax.toStringAsFixed(<span class="code-number">1</span>),
+    };
+  }
+}</code></pre>
+                </div>
+
+                <div class="note-box">
+                    <p><strong>🚀 En las clases en vivo exploraremos:</strong></p>
+                    <ul>
+                        <li>Exportar datos a formatos GIS estándar (GPX, KML, GeoJSON)</li>
+                        <li>Importar datos desde archivos externos</li>
+                        <li>Estrategias de sincronización con servidores</li>
+                        <li>Manejo de conflictos (¿qué pasa si editas offline y hay cambios en la nube?)</li>
+                        <li>Optimización de consultas para miles de puntos</li>
+                        <li>Backup y restauración de datos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="completeModule(4)">
+                <span>✓</span> Marcar Módulo como Completado
+            </button>
+        </div>
+
+        <!-- Module 5: Proyecto Final -->
+        <div class="tab-content" id="module-5">
+            <div class="module-header">
+                <h2>🚀 Módulo 5: Proyecto Final - App de Campo para Levantamiento Topográfico</h2>
+                <p class="module-description">
+                    Integra todo lo aprendido en un proyecto real: una aplicación móvil completa para levantamiento topográfico simple, que funcione offline y sea útil en campo.
+                </p>
+            </div>
+
+            <div class="content-section">
+                <h3>🎯 Especificaciones del Proyecto</h3>
+                
+                <div class="example-box">
+                    <h4>📋 ¿Qué vamos a construir?</h4>
+                    <p>
+                        Una aplicación móvil llamada <strong>"TopoField"</strong> que permita a técnicos y profesionales GIS realizar levantamientos topográficos básicos en campo, capturando puntos GPS con metadatos, visualizándolos en un mapa simple, y exportando los datos para análisis posterior.
+                    </p>
+                </div>
+
+                <h4>🔹 Funcionalidades Core</h4>
+                <p>Tu app debe tener estas características esenciales:</p>
+
+                <div class="content-section" style="background: rgba(74, 144, 226, 0.05); margin-top: 1rem;">
+                    <h4>1. Pantalla de Captura de Puntos</h4>
+                    <ul>
+                        <li>Botón grande "Capturar Punto GPS"</li>
+                        <li>Muestra coordenadas en tiempo real (lat, lng, altitud)</li>
+                        <li>Indicador de precisión del GPS</li>
+                        <li>Formulario para ingresar: nombre del punto, tipo (esquina, poste, árbol, etc.), observaciones</li>
+                        <li>Opción de tomar foto del punto</li>
+                        <li>Guardar punto en SQLite</li>
+                    </ul>
+
+                    <h4>2. Pantalla de Lista de Puntos</h4>
+                    <ul>
+                        <li>Muestra todos los puntos capturados</li>
+                        <li>Permite búsqueda por nombre o tipo</li>
+                        <li>Muestra fecha/hora de captura y precisión</li>
+                        <li>Opción de editar o eliminar puntos</li>
+                        <li>Indicador de puntos sincronizados vs pendientes</li>
+                    </ul>
+
+                    <h4>3. Pantalla de Estadísticas</h4>
+                    <ul>
+                        <li>Total de puntos capturados</li>
+                        <li>Rango de altitudes (min, max, promedio)</li>
+                        <li>Área aproximada del polígono formado por los puntos</li>
+                        <li>Distancia total recorrida (si se activó tracking)</li>
+                    </ul>
+
+                    <h4>4. Funcionalidad de Exportación</h4>
+                    <ul>
+                        <li>Exportar a CSV con todas las columnas</li>
+                        <li>Exportar a formato GPX (para usar en QGIS, Google Earth)</li>
+                        <li>Compartir archivo por WhatsApp, email, Drive</li>
+                    </ul>
+                </div>
+
+                <h4>🔹 Arquitectura de la App</h4>
+                <p>Estructura recomendada de carpetas y archivos:</p>
+
+                <div class="code-block">
+                    <div class="code-header">📁 Estructura del Proyecto</div>
+                    <pre><code>lib/
+├── main.dart
+├── models/
+│   └── punto_gps.dart          <span class="code-comment">// Clase del modelo</span>
+├── database/
+│   └── database_helper.dart    <span class="code-comment">// Operaciones SQLite</span>
+├── screens/
+│   ├── home_screen.dart        <span class="code-comment">// Pantalla principal con tabs</span>
+│   ├── captura_screen.dart     <span class="code-comment">// Capturar puntos GPS</span>
+│   ├── lista_screen.dart       <span class="code-comment">// Listar puntos</span>
+│   └── stats_screen.dart       <span class="code-comment">// Estadísticas</span>
+├── widgets/
+│   ├── gps_indicator.dart      <span class="code-comment">// Widget para mostrar estado GPS</span>
+│   └── punto_card.dart         <span class="code-comment">// Card para cada punto en la lista</span>
+└── utils/
+    ├── gps_helper.dart         <span class="code-comment">// Funciones de geolocalización</span>
+    └── export_helper.dart      <span class="code-comment">// Funciones de exportación</span></code></pre>
+                </div>
+
+                <h4>🔹 Flujo de Usuario</h4>
+                <div class="analogy-box">
+                    <h4>🚶 Día típico de un topógrafo usando TopoField:</h4>
+                    <p>
+                        <strong>7:00 AM</strong> - Llega al sitio de levantamiento. Abre TopoField, verifica que el GPS tiene buena señal (precisión &lt;10m).
+                    </p>
+                    <p>
+                        <strong>7:15 AM</strong> - Captura el primer punto: "Esquina Noroeste", toma una foto, agrega observación "Cerca de árbol grande". La app lo guarda localmente.
+                    </p>
+                    <p>
+                        <strong>7:30 AM</strong> - Camina al siguiente punto. La app (opcionalmente) está rastreando la ruta.
+                    </p>
+                    <p>
+                        <strong>12:00 PM</strong> - Ya capturó 45 puntos. Va a "Estadísticas" y ve que cubrió un área de ~2.3 hectáreas, con altitudes entre 2650m y 2680m.
+                    </p>
+                    <p>
+                        <strong>4:00 PM</strong> - Termina el día. Exporta los datos a GPX, los comparte por WhatsApp a su supervisor, y también guarda una copia en Google Drive.
+                    </p>
+                    <p>
+                        <strong>Noche</strong> - En la oficina, abre el archivo GPX en QGIS y comienza el análisis formal.
+                    </p>
+                </div>
+
+                <h4>🔹 Desafíos Técnicos que Resolverás</h4>
+                <div class="content-section" style="background: rgba(245, 158, 11, 0.05); margin-top: 1rem;">
+                    <p><strong>Desafío 1: Manejo de Permisos</strong></p>
+                    <p>Deberás manejar permisos de ubicación y cámara en Android/iOS de forma robusta.</p>
+
+                    <p><strong>Desafío 2: UI Responsiva</strong></p>
+                    <p>La app debe verse bien en teléfonos pequeños y tablets grandes.</p>
+
+                    <p><strong>Desafío 3: Validación de Datos</strong></p>
+                    <p>Evitar guardar puntos con mala precisión GPS, validar que los campos no estén vacíos.</p>
+
+                    <p><strong>Desafío 4: Generación de Archivos</strong></p>
+                    <p>Crear archivos GPX válidos según el estándar, y permitir que el usuario los comparta.</p>
+
+                    <p><strong>Desafío 5: Persistencia Confiable</strong></p>
+                    <p>Asegurar que los datos nunca se pierdan, incluso si la app se cierra inesperadamente.</p>
+                </div>
+
+                <h4>🔹 Código de Ejemplo: Modelo de Punto GPS</h4>
+                <div class="code-block">
+                    <div class="code-header">📝 models/punto_gps.dart</div>
+                    <pre><code><span class="code-keyword">class</span> PuntoGPS {
+  <span class="code-keyword">final int</span>? id;
+  <span class="code-keyword">final</span> String nombre;
+  <span class="code-keyword">final double</span> latitud;
+  <span class="code-keyword">final double</span> longitud;
+  <span class="code-keyword">final double</span>? altitud;
+  <span class="code-keyword">final double</span>? precision;
+  <span class="code-keyword">final</span> String tipo; <span class="code-comment">// esquina, poste, árbol, etc.</span>
+  <span class="code-keyword">final</span> String? observaciones;
+  <span class="code-keyword">final</span> String? rutaFoto;
+  <span class="code-keyword">final</span> DateTime fechaCaptura;
+  <span class="code-keyword">final bool</span> sincronizado;
+
+  PuntoGPS({
+    <span class="code-keyword">this</span>.id,
+    <span class="code-keyword">required this</span>.nombre,
+    <span class="code-keyword">required this</span>.latitud,
+    <span class="code-keyword">required this</span>.longitud,
+    <span class="code-keyword">this</span>.altitud,
+    <span class="code-keyword">this</span>.precision,
+    <span class="code-keyword">required this</span>.tipo,
+    <span class="code-keyword">this</span>.observaciones,
+    <span class="code-keyword">this</span>.rutaFoto,
+    <span class="code-keyword">required this</span>.fechaCaptura,
+    <span class="code-keyword">this</span>.sincronizado = <span class="code-keyword">false</span>,
+  });
+
+  <span class="code-comment">// Convertir a Map para SQLite</span>
+  Map&lt;String, <span class="code-keyword">dynamic</span>&gt; toMap() {
+    <span class="code-keyword">return</span> {
+      <span class="code-string">'id'</span>: id,
+      <span class="code-string">'nombre'</span>: nombre,
+      <span class="code-string">'latitud'</span>: latitud,
+      <span class="code-string">'longitud'</span>: longitud,
+      <span class="code-string">'altitud'</span>: altitud,
+      <span class="code-string">'precision'</span>: precision,
+      <span class="code-string">'tipo'</span>: tipo,
+      <span class="code-string">'observaciones'</span>: observaciones,
+      <span class="code-string">'ruta_foto'</span>: rutaFoto,
+      <span class="code-string">'fecha_captura'</span>: fechaCaptura.toIso8601String(),
+      <span class="code-string">'sincronizado'</span>: sincronizado ? <span class="code-number">1</span> : <span class="code-number">0</span>,
+    };
+  }
+
+  <span class="code-comment">// Crear desde Map de SQLite</span>
+  <span class="code-keyword">factory</span> PuntoGPS.fromMap(Map&lt;String, <span class="code-keyword">dynamic</span>&gt; map) {
+    <span class="code-keyword">return</span> PuntoGPS(
+      id: map[<span class="code-string">'id'</span>],
+      nombre: map[<span class="code-string">'nombre'</span>],
+      latitud: map[<span class="code-string">'latitud'</span>],
+      longitud: map[<span class="code-string">'longitud'</span>],
+      altitud: map[<span class="code-string">'altitud'</span>],
+      precision: map[<span class="code-string">'precision'</span>],
+      tipo: map[<span class="code-string">'tipo'</span>],
+      observaciones: map[<span class="code-string">'observaciones'</span>],
+      rutaFoto: map[<span class="code-string">'ruta_foto'</span>],
+      fechaCaptura: DateTime.parse(map[<span class="code-string">'fecha_captura'</span>]),
+      sincronizado: map[<span class="code-string">'sincronizado'</span>] == <span class="code-number">1</span>,
+    );
+  }
+}</code></pre>
+                </div>
+
+                <h4>🔹 Criterios de Evaluación del Proyecto</h4>
+                <div class="content-section" style="background: rgba(57, 211, 83, 0.05); margin-top: 1rem;">
+                    <p><strong>✅ Funcionalidad (40%):</strong></p>
+                    <ul>
+                        <li>Todas las funciones core implementadas y funcionando</li>
+                        <li>App no crashea, maneja errores graciosamente</li>
+                    </ul>
+
+                    <p><strong>✅ Código Limpio (25%):</strong></p>
+                    <ul>
+                        <li>Código bien organizado, con comentarios donde necesario</li>
+                        <li>Nombres de variables descriptivos</li>
+                        <li>Sin código duplicado</li>
+                    </ul>
+
+                    <p><strong>✅ UI/UX (20%):</strong></p>
+                    <ul>
+                        <li>Interfaz intuitiva, fácil de usar en campo</li>
+                        <li>Responsive y funcional en diferentes tamaños de pantalla</li>
+                        <li>Feedback visual claro (loading, success, errors)</li>
+                    </ul>
+
+                    <p><strong>✅ Creatividad (15%):</strong></p>
+                    <ul>
+                        <li>Funcionalidades extra que agregaste</li>
+                        <li>Soluciones innovadoras a problemas</li>
+                    </ul>
+                </div>
+
+                <div class="note-box">
+                    <p><strong>🎓 Entrega del Proyecto:</strong></p>
+                    <p>
+                        Al completar tu proyecto, deberás enviar:
+                    </p>
+                    <ul>
+                        <li>Código fuente completo (GitHub repo o .zip)</li>
+                        <li>APK funcional para instalar y probar</li>
+                        <li>Video de 3-5 minutos demostrando las funcionalidades</li>
+                        <li>README con instrucciones de instalación</li>
+                    </ul>
+                    <p>
+                        Durante las sesiones en vivo, recibirás feedback personalizado y ayuda con cualquier bloqueador técnico.
+                    </p>
+                </div>
+
+                <div class="example-box">
+                    <h4>🏆 Ideas para Destacar tu Proyecto:</h4>
+                    <ul>
+                        <li><strong>Tema oscuro:</strong> Ideal para trabajar en campo bajo el sol intenso</li>
+                        <li><strong>Modo offline avanzado:</strong> Sincronización inteligente cuando hay WiFi</li>
+                        <li><strong>Tracking de batería:</strong> Alertar si la batería es baja durante captura</li>
+                        <li><strong>Múltiples proyectos:</strong> Permitir organizar puntos en diferentes "proyectos"</li>
+                        <li><strong>Backup automático:</strong> Subir backups a Google Drive automáticamente</li>
+                        <li><strong>Modo equipo:</strong> Compartir datos en tiempo real con otros miembros del equipo</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="complete-btn" onclick="completeModule(5)">
+                <span>✓</span> Marcar Módulo como Completado
+            </button>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="pricing-section">
+            <span class="pricing-badge">🎉 Oferta de Lanzamiento</span>
+            <h2>Invierte en tu Futuro como Desarrollador GIS</h2>
+            <p style="color: var(--text-gray); margin-bottom: 2rem;">
+                Acceso completo al curso, clases en vivo, mentoría personalizada y certificado profesional.
+            </p>
+
+            <div class="price-comparison">
+                <div class="old-price">$400</div>
+                <div class="new-price">$249</div>
+                <div class="discount-badge">38% OFF</div>
+            </div>
+
+            <p style="color: var(--text-gray); margin: 1rem 0;">
+                <strong>Valor real que recibes: $800+</strong>
+            </p>
+
+            <ul class="value-list">
+                <li>26 horas de clases en vivo con Daniel</li>
+                <li>Acceso de por vida a grabaciones y material</li>
+                <li>Soporte personalizado en tu proyecto</li>
+                <li>Certificado digital avalado por ARTEC</li>
+                <li>Grupo privado de WhatsApp</li>
+                <li>Código fuente de todos los ejemplos</li>
+                <li>Templates y plantillas descargables</li>
+                <li>Actualizaciones gratuitas del contenido</li>
+            </ul>
+
+            <a href="https://wa.me/59167145303?text=Hola%20Daniel!%20Quiero%20inscribirme%20al%20curso%20Flutter%20GIS%20Básico" target="_blank" class="cta-pricing">
+                <span>💬</span> Inscribirme Ahora por WhatsApp
+            </a>
+
+            <p style="color: var(--text-gray); margin-top: 2rem; font-size: 0.95rem;">
+                ⚡ Cupos limitados • Próximo grupo inicia pronto
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-logos">
+            <img src="https://arte-tecnologias.com/IMG/logo/logo-artec.png" alt="ARTEC" class="footer-logo">
+        </div>
+        <p><strong>Curso creado por:</strong> Daniel Quisbert</p>
+        <p><strong>En colaboración con:</strong> ARTEC - Centro de Capacitación</p>
+        <p style="margin-top: 1rem;">© 2025 • Certificación avalada por ARTEC</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+            <a href="https://arte-tecnologias.com" target="_blank" style="color: var(--accent-green); text-decoration: none;">www.arte-tecnologias.com</a>
+        </p>
+    </footer>
+
+    <script>
+        // Progress tracking
+        const STORAGE_KEY = 'curso_basico_progress';
+        let completedModules = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+        // Quiz questions for each module
+        const quizzes = {
+            1: {
+                question: "¿Cuál es la forma correcta de declarar una variable para almacenar una coordenada de latitud en Dart?",
+                options: [
+                    "String latitud = '-16.5000';",
+                    "double latitud = -16.5000;",
+                    "int latitud = -16.5000;",
+                    "var latitud = '-16.5000';"
+                ],
+                correct: 1
+            },
+            2: {
+                question: "¿Qué widget de Flutter usarías para crear una lista scrollable de ubicaciones GPS que se construya eficientemente incluso con miles de elementos?",
+                options: [
+                    "Column con SingleChildScrollView",
+                    "ListView",
+                    "ListView.builder",
+                    "GridView"
+                ],
+                correct: 2
+            },
+            3: {
+                question: "Al usar Geolocator.getCurrentPosition(), ¿qué indica el valor de position.accuracy?",
+                options: [
+                    "La velocidad actual del dispositivo en metros/segundo",
+                    "El radio de error estimado en metros de la ubicación",
+                    "La altitud sobre el nivel del mar en metros",
+                    "El número de satélites GPS conectados"
+                ],
+                correct: 1
+            },
+            4: {
+                question: "Si necesitas guardar un punto GPS con sus coordenadas, nombre, y descripción para acceso rápido sin conexión, ¿cuál es la mejor opción?",
+                options: [
+                    "Variables globales en la app",
+                    "SharedPreferences",
+                    "SQLite con una tabla estructurada",
+                    "Archivo de texto plano"
+                ],
+                correct: 2
+            },
+            5: {
+                question: "Para un proyecto de levantamiento topográfico, ¿cuál es el enfoque MÁS profesional para validar que un punto GPS capturado tiene calidad suficiente?",
+                options: [
+                    "Guardar todos los puntos sin validación",
+                    "Solo verificar que latitude y longitude no sean null",
+                    "Verificar position.accuracy y rechazar puntos con precisión mayor a 20 metros",
+                    "Esperar exactamente 10 segundos antes de cada captura"
+                ],
+                correct: 2
+            }
+        };
+
+        // Initialize
+        function init() {
+            updateProgress();
+            updateTabButtons();
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const total = 5;
+            const completed = completedModules.length;
+            const percentage = Math.round((completed / total) * 100);
+            
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = percentage + '%';
+        }
+
+        // Update tab buttons state
+        function updateTabButtons() {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach((btn, index) => {
+                const moduleNum = index + 1;
+                
+                if (completedModules.includes(moduleNum)) {
+                    btn.classList.add('completed');
+                    btn.classList.remove('locked');
+                } else if (moduleNum === 1 || completedModules.includes(moduleNum - 1)) {
+                    btn.classList.remove('locked');
+                } else {
+                    btn.classList.add('locked');
+                }
+            });
+        }
+
+        // Show quiz
+        function showQuiz(moduleNumber) {
+            const quiz = quizzes[moduleNumber];
+            if (!quiz) return;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'quiz-overlay';
+            overlay.innerHTML = `
+                <div class="quiz-modal">
+                    <h3>🎯 Pregunta de Validación - Módulo ${moduleNumber}</h3>
+                    <p class="quiz-question">${quiz.question}</p>
+                    <div class="quiz-options">
+                        ${quiz.options.map((option, index) => `
+                            <div class="quiz-option" data-index="${index}">
+                                ${String.fromCharCode(65 + index)}) ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="quiz-feedback" style="display: none;"></div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // Handle option click
+            overlay.querySelectorAll('.quiz-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const selectedIndex = parseInt(this.dataset.index);
+                    const isCorrect = selectedIndex === quiz.correct;
+                    const feedback = overlay.querySelector('.quiz-feedback');
+
+                    // Disable all options
+                    overlay.querySelectorAll('.quiz-option').forEach(opt => {
+                        opt.style.pointerEvents = 'none';
+                    });
+
+                    // Mark correct/incorrect
+                    this.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    overlay.querySelectorAll('.quiz-option')[quiz.correct].classList.add('correct');
+
+                    // Show feedback
+                    feedback.style.display = 'block';
+                    feedback.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                    feedback.innerHTML = isCorrect
+                        ? '🎉 ¡Correcto! Puedes continuar al siguiente módulo.'
+                        : '❌ Incorrecto. Revisa el contenido e inténtalo de nuevo.';
+
+                    // If correct, unlock next module and close
+                    if (isCorrect) {
+                        setTimeout(() => {
+                            unlockModule(moduleNumber + 1);
+                            document.body.removeChild(overlay);
+                        }, 2000);
+                    } else {
+                        // Allow retry
+                        setTimeout(() => {
+                            document.body.removeChild(overlay);
+                        }, 3000);
+                    }
+                });
+            });
+        }
+
+        // Complete module
+        function completeModule(moduleNumber) {
+            if (!completedModules.includes(moduleNumber)) {
+                completedModules.push(moduleNumber);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(completedModules));
+                updateProgress();
+                updateTabButtons();
+            }
+
+            // Show quiz to unlock next module
+            if (moduleNumber < 5) {
+                showQuiz(moduleNumber);
+            } else {
+                alert('🎉 ¡Felicitaciones! Has completado todo el curso Flutter GIS Básico. Ahora puedes comenzar tu proyecto final.');
+            }
+        }
+
+        // Unlock module
+        function unlockModule(moduleNumber) {
+            const button = document.querySelector(`.tab-btn[data-module="${moduleNumber}"]`);
+            if (button) {
+                button.classList.remove('locked');
+                button.querySelector('span').textContent = moduleNumber === 5 ? '🚀' : '📌';
+            }
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const moduleNum = parseInt(this.dataset.module);
+                
+                // Check if locked
+                if (this.classList.contains('locked')) {
+                    const prevModule = moduleNum - 1;
+                    alert(`⚠️ Primero debes completar el Módulo ${prevModule} y responder la pregunta de validación.`);
+                    return;
+                }
+
+                // Switch tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(`module-${moduleNum}`).classList.add('active');
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
