@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aprende Flutter y desarrollo móvil GIS. Crea apps que pagan $3000+ al mes. Cursos prácticos con Daniel Quisbert.">
+    <title>Cursos Flutter GIS - Convierte tu Conocimiento en Apps Rentables | Daniel Quisbert</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e1a;
+            --secondary-dark: #151b2d;
+            --accent-green: #39d353;
+            --accent-blue: #4A90E2;
+            --accent-purple: #8B5CF6;
+            --accent-orange: #F59E0B;
+            --accent-red: #EF4444;
+            --text-light: #ffffff;
+            --text-gray: #c9d1d9;
+            --gradient-primary: linear-gradient(135deg, #39d353 0%, #2ea043 100%);
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--primary-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(57, 211, 83, 0.1);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-cta {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.7rem 1.8rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(57, 211, 83, 0.3);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: var(--gradient-hero);
+            padding-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(57, 211, 83, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1000px;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            color: #F59E0B;
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero h1 .highlight {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.15rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(57, 211, 83, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(57, 211, 83, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.15rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-green);
+            background: rgba(57, 211, 83, 0.1);
+        }
+
+        .opportunity {
+            background: var(--secondary-dark);
+            padding: 5rem 2rem;
+            border-top: 1px solid rgba(57, 211, 83, 0.1);
+            border-bottom: 1px solid rgba(57, 211, 83, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #F59E0B;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .opportunity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .opportunity-card {
+            background: var(--primary-dark);
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .opportunity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .opportunity-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(57, 211, 83, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--accent-green);
+        }
+
+        .card-description {
+            color: var(--text-gray);
+            line-height: 1.8;
+        }
+
+        .card-highlight {
+            background: rgba(57, 211, 83, 0.1);
+            color: var(--accent-green);
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .problem-solution {
+            padding: 5rem 2rem;
+            background: var(--primary-dark);
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .comparison-card {
+            background: var(--secondary-dark);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comparison-card.before {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .comparison-card.after {
+            border-color: rgba(57, 211, 83, 0.3);
+            background: linear-gradient(135deg, rgba(57, 211, 83, 0.05) 0%, var(--secondary-dark) 100%);
+        }
+
+        .comparison-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparison-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-card.before .comparison-title {
+            color: var(--accent-red);
+        }
+
+        .comparison-card.after .comparison-title {
+            color: var(--accent-green);
+        }
+
+        .comparison-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .comparison-list li {
+            padding: 0.8rem 0;
+            color: var(--text-gray);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .comparison-list li::before {
+            content: '✗';
+            color: var(--accent-red);
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .comparison-card.after .comparison-list li::before {
+            content: '✓';
+            color: var(--accent-green);
+        }
+
+        .courses {
+            padding: 5rem 2rem;
+            background: var(--secondary-dark);
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .course-card {
+            background: var(--primary-dark);
+            border-radius: 25px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .course-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .course-header {
+            padding: 2.5rem;
+            background: var(--gradient-hero);
+            position: relative;
+            text-align: center;
+        }
+
+        .course-card.advanced .course-header {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+        }
+
+        .course-level {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .course-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-duration {
+            opacity: 0.9;
+        }
+
+        .course-body {
+            padding: 2.5rem;
+        }
+
+        .course-price {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-old {
+            font-size: 1.3rem;
+            color: var(--text-gray);
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .price-new {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            margin: 0.5rem 0;
+        }
+
+        .price-label {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+
+        .course-features {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .course-features li {
+            padding: 0.8rem 0;
+            color: var(--text-gray);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .course-features li::before {
+            content: '✓';
+            background: var(--accent-green);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+
+        .course-cta {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.2rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: block;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .course-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(57, 211, 83, 0.4);
+        }
+
+        .course-link {
+            text-align: center;
+            display: block;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .course-link:hover {
+            color: var(--accent-green);
+        }
+
+        .guarantee {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, rgba(57, 211, 83, 0.05) 0%, var(--primary-dark) 100%);
+        }
+
+        .guarantee-content {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--secondary-dark);
+            border: 2px solid var(--accent-green);
+            border-radius: 25px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .guarantee-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .guarantee-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--accent-green);
+        }
+
+        .guarantee-text {
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            line-height: 1.8;
+        }
+
+        .faq {
+            padding: 5rem 2rem;
+            background: var(--secondary-dark);
+        }
+
+        .faq-list {
+            max-width: 800px;
+            margin: 3rem auto 0;
+        }
+
+        .faq-item {
+            background: var(--primary-dark);
+            border: 1px solid rgba(57, 211, 83, 0.2);
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: var(--accent-green);
+        }
+
+        .faq-question {
+            padding: 1.5rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: var(--accent-green);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-question::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 2rem;
+            color: var(--text-gray);
+            line-height: 1.8;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 2rem 1.5rem;
+        }
+
+        .final-cta {
+            padding: 6rem 2rem;
+            background: var(--gradient-hero);
+            text-align: center;
+        }
+
+        .final-cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .final-cta h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .final-cta p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+        }
+
+        .urgency-box {
+            background: rgba(245, 158, 11, 0.2);
+            border: 2px solid rgba(245, 158, 11, 0.5);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2.5rem;
+        }
+
+        .urgency-box strong {
+            color: #F59E0B;
+            font-size: 1.2rem;
+        }
+
+        footer {
+            background: var(--secondary-dark);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(57, 211, 83, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-logo {
+            max-height: 60px;
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+
+        footer p {
+            color: var(--text-gray);
+            margin: 0.5rem 0;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.3rem;
+            border: 1px solid rgba(57, 211, 83, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-5px);
+        }
+
+        .whatsapp-float {
+            position: fixed;
+            width: 65px;
+            height: 65px;
+            bottom: 30px;
+            right: 30px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 32px;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            animation: pulse-wa 2s infinite;
+        }
+
+        @keyframes pulse-wa {
+            0% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.7); }
+            100% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4); }
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 968px) {
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-stats {
+                gap: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-ctas {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .opportunity-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .whatsapp-float {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Daniel Quisbert</div>
+            <a href="https://wa.me/59167145303?text=Hola%20Daniel!%20Quiero%20más%20información%20sobre%20los%20cursos" class="nav-cta" target="_blank">
+                💬 Contáctame
+            </a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">🔥 CUPOS LIMITADOS - Próximo grupo inicia pronto</div>
+            <h1>
+                Convierte tu Conocimiento GIS en <span class="highlight">Apps que Pagan $3000+ al Mes</span>
+            </h1>
+            <p class="hero-subtitle">
+                El mercado necesita desarrolladores GIS móviles y casi no hay. Aprende Flutter + Mapas en 6 semanas y accede a proyectos que pagan 10x más que trabajos tradicionales.
+            </p>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">$3000-5000</span>
+                    <span class="stat-label">Pago promedio por proyecto</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">85%</span>
+                    <span class="stat-label">Escasez de devs GIS</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">6 semanas</span>
+                    <span class="stat-label">Para dominar el stack</span>
+                </div>
+            </div>
+
+            <div class="hero-ctas">
+                <a href="#courses" class="btn-primary">Ver Cursos Disponibles</a>
+                <a href="https://wa.me/59167145303?text=Hola%20Daniel!%20Necesito%20asesoría%20sobre%20qué%20curso%20tomar" class="btn-secondary" target="_blank">
+                    Asesoría Gratuita
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="opportunity">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">💰 Oportunidad de Mercado</span>
+                <h2 class="section-title">Por Qué Ahora es el Momento Perfecto</h2>
+                <p class="section-subtitle">
+                    Empresas, gobiernos y startups necesitan apps con mapas. La demanda supera la oferta por 5 a 1.
+                </p>
+            </div>
+
+            <div class="opportunity-grid">
+                <div class="opportunity-card">
+                    <span class="card-icon">🏢</span>
+                    <h3 class="card-title">Demanda Empresarial Explosiva</h3>
+                    <p class="card-description">
+                        Logística, delivery, agricultura de precisión, minería, turismo... Cada industria necesita apps con geolocalización. Proyectos que antes costaban $50,000 ahora buscan soluciones móviles a $5,000.
+                    </p>
+                    <div class="card-highlight">Proyectos desde $3,000 USD</div>
+                </div>
+
+                <div class="opportunity-card">
+                    <span class="card-icon">📊</span>
+                    <h3 class="card-title">Escasez Crítica de Talento</h3>
+                    <p class="card-description">
+                        Hay miles de desarrolladores web. Hay cientos de devs móviles. Pero hay MENOS DE 50 desarrolladores Flutter con conocimientos GIS profesionales en Latinoamérica. Tú puedes ser uno de ellos.
+                    </p>
+                    <div class="card-highlight">85% de vacantes sin llenar</div>
+                </div>
+
+                <div class="opportunity-card">
+                    <span class="card-icon">🚀</span>
+                    <h3 class="card-title">Stack Moderno y Rentable</h3>
+                    <p class="card-description">
+                        Flutter + GIS es el combo perfecto: una base de código para Android e iOS, integración nativa con GPS y mapas, y la capacidad de cobrar premium por experiencia geoespacial.
+                    </p>
+                    <div class="card-highlight">2x-3x más que dev tradicional</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="problem-solution">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">🎯 Tu Transformación</span>
+                <h2 class="section-title">De Conocer SIG a Crear Apps que Generan Ingresos</h2>
+            </div>
+
+            <div class="comparison">
+                <div class="comparison-card before">
+                    <div class="comparison-icon">😓</div>
+                    <h3 class="comparison-title">TÚ AHORA</h3>
+                    <ul class="comparison-list">
+                        <li>Sabes GIS pero solo desde escritorio (QGIS, ArcGIS)</li>
+                        <li>Trabajos técnicos que pagan $500-800/mes</li>
+                        <li>Dependes de empleadores para proyectos</li>
+                        <li>No puedes crear soluciones móviles propias</li>
+                        <li>Ves oportunidades pero no tienes las herramientas</li>
+                        <li>Competencia con miles de técnicos GIS tradicionales</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card after">
+                    <div class="comparison-icon">🚀</div>
+                    <h3 class="comparison-title">TÚ DESPUÉS</h3>
+                    <ul class="comparison-list">
+                        <li>Creas apps GIS profesionales desde cero</li>
+                        <li>Proyectos freelance de $3,000-5,000 USD</li>
+                        <li>Trabajo remoto para empresas internacionales</li>
+                        <li>Lanzas tus propias apps educativas o de nicho</li>
+                        <li>Consultoría técnica a $80-150/hora</li>
+                        <li>Parte del 1% de devs con este skillset único</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="courses" id="courses">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">🎓 Rutas de Aprendizaje</span>
+                <h2 class="section-title">Elige tu Nivel y Comienza Hoy</h2>
+                <p class="section-subtitle">
+                    Dos cursos diseñados para llevarte de cero a crear apps GIS empresariales. Aprende haciendo.
+                </p>
+            </div>
+
+            <div class="courses-grid">
+                <div class="course-card">
+                    <div class="course-header">
+                        <div class="course-level">🌱 Nivel Inicial - Ideal para Empezar</div>
+                        <h3 class="course-title">Flutter GIS Básico</h3>
+                        <p class="course-duration">6 semanas • 26 horas de clases en vivo</p>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-price">
+                            <span class="price-old">Valor regular: $400</span>
+                            <span class="price-new">$249</span>
+                            <span class="price-label">Pago único • Acceso de por vida</span>
+                        </div>
+
+                        <ul class="course-features">
+                            <li><strong>Fundamentos Dart</strong> aplicados a datos geoespaciales</li>
+                            <li><strong>Flutter desde cero</strong> con enfoque en apps GIS</li>
+                            <li><strong>Geolocalización GPS</strong> y manejo de coordenadas</li>
+                            <li><strong>Base de datos SQLite</strong> para geodatos offline</li>
+                            <li><strong>Proyecto Final:</strong> App de campo funcional</li>
+                            <li>Certificado avalado por ARTEC</li>
+                            <li>Mentoría personalizada</li>
+                            <li>Grupo privado de WhatsApp</li>
+                        </ul>
+
+                        <a href="https://wa.me/59167145303?text=Hola%20Daniel!%20Quiero%20inscribirme%20al%20curso%20Flutter%20GIS%20Básico" class="course-cta" target="_blank">
+                            💬 Inscribirme Ahora - $249
+                        </a>
+                        <a href="curso-basico.html" class="course-link">
+                            Ver Programa Completo →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="course-card advanced">
+                    <div class="course-header">
+                        <div class="course-level">🚀 Nivel Avanzado - Para Profesionales</div>
+                        <h3 class="course-title">GIS Pro Mobile</h3>
+                        <p class="course-duration">6 semanas • 32 horas + mentoría 1-a-1</p>
+                    </div>
+                    <div class="course-body">
+                        <div class="course-price">
+                            <span class="price-old">Valor regular: $550</span>
+                            <span class="price-new">$349</span>
+                            <span class="price-label">Inversión profesional • ROI en 1-2 proyectos</span>
+                        </div>
+
+                        <ul class="course-features">
+                            <li><strong>Mapas avanzados:</strong> Google Maps, OSM, clustering</li>
+                            <li><strong>Notificaciones push</strong> y alertas geoespaciales</li>
+                            <li><strong>APIs WMS/WFS</strong> y servicios web OGC</li>
+                            <li><strong>Análisis espacial móvil:</strong> buffers, intersecciones</li>
+                            <li><strong>Captura profesional</strong> con formularios dinámicos</li>
+                            <li><strong>Deploy en Play Store</strong> con mejores prácticas</li>
+                            <li>Código de apps reales empresariales</li>
+                            <li>Mentoría 1-a-1 personalizada</li>
+                        </ul>
+
+                        <a href="https://wa.me/59167145303?text=Hola%20Daniel!%20Quiero%20inscribirme%20al%20curso%20GIS%20Pro%20Mobile" class="course-cta" target="_blank">
+                            💬 Inscribirme Ahora - $349
+                        </a>
+                        <a href="curso-avanzado.html" class="course-link">
+                            Ver Programa Completo →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="guarantee">
+        <div class="container">
+            <div class="guarantee-content">
+                <div class="guarantee-icon">🛡️</div>
+                <h2 class="guarantee-title">Mi Garantía Personal</h2>
+                <p class="guarantee-text">
+                    He desarrollado apps para más de 1 millón de usuarios, trabajado con gobiernos y empresas. Si sigues el programa, haces los proyectos y asistes a las clases, saldrás con las habilidades para crear apps GIS profesionales. <strong>Si no quedas satisfecho con la calidad del contenido, conversemos y encontraremos una solución.</strong>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">❓ Preguntas Frecuentes</span>
+                <h2 class="section-title">¿Tienes Dudas? Aquí las Respuestas</h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Necesito experiencia previa en programación?
+                    </div>
+                    <div class="faq-answer">
+                        Para el curso básico, NO necesitas experiencia previa. Comenzamos desde cero con los fundamentos de Dart y Flutter. Si ya eres programador, avanzarás más rápido. Para el curso avanzado, se recomienda tener conocimientos básicos de programación o haber completado el curso inicial.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Cuánto tiempo necesito invertir por semana?
+                    </div>
+                    <div class="faq-answer">
+                        El curso básico requiere ~4-5 horas semanales (2h de clase en vivo + 2-3h de práctica). El avanzado ~5-6 horas semanales. Las clases quedan grabadas, así que si no puedes asistir en vivo, puedes verlas después.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Qué equipo necesito para el curso?
+                    </div>
+                    <div class="faq-answer">
+                        Una computadora con al menos 8GB de RAM (Windows, Mac o Linux), conexión a internet, y un teléfono Android o iOS para probar las apps. Todo el software que usaremos es gratuito (Flutter, Android Studio, Visual Studio Code).
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Realmente puedo ganar $3000+ con estos conocimientos?
+                    </div>
+                    <div class="faq-answer">
+                        Sí, pero requiere trabajo. Yo mismo cobro entre $3,000-5,000 por apps medianas. En plataformas como Upwork, proyectos GIS móviles pagan $40-80/hora. Un proyecto de 60-80 horas = $3,000-4,000. La clave es: terminar el curso, construir tu portafolio con 2-3 apps de ejemplo, y comenzar a buscar clientes activamente.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Qué pasa si no puedo asistir a una clase en vivo?
+                    </div>
+                    <div class="faq-answer">
+                        Todas las clases quedan grabadas en alta calidad. Tendrás acceso de por vida a las grabaciones, código fuente y material complementario. Además, el grupo de WhatsApp está activo 24/7 para resolver dudas.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Cuál es la diferencia entre los dos cursos?
+                    </div>
+                    <div class="faq-answer">
+                        El básico te enseña los fundamentos: Dart, Flutter, GPS básico y almacenamiento local. Perfecto si estás empezando. El avanzado asume que ya programas y va directo a: mapas complejos, APIs empresariales, análisis espacial y deployment profesional. Si ya sabes programar, puedes empezar directo con el avanzado.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿El certificado tiene validez oficial?
+                    </div>
+                    <div class="faq-answer">
+                        El certificado está avalado por ARTEC, centro de capacitación reconocido en Bolivia. Más importante: tendrás un portafolio en GitHub con apps funcionales que demuestran tus habilidades. Los empleadores y clientes valoran más lo que puedes HACER que un papel.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <div class="final-cta-content">
+            <h2>El Mercado No Esperará. Tu Oportunidad es Ahora.</h2>
+            <p>
+                Mientras lees esto, empresas están buscando desesperadamente desarrolladores GIS. Cada semana que pasa es dinero que dejas sobre la mesa.
+            </p>
+
+            <div class="urgency-box">
+                <strong>⚡ CUPOS LIMITADOS:</strong> Solo acepto 15 estudiantes por grupo para garantizar mentoría personalizada. Próximo grupo inicia pronto.
+            </div>
+
+            <a href="https://wa.me/59167145303?text=Hola%20Daniel!%20Quiero%20asegurar%20mi%20cupo%20en%20los%20cursos%20de%20Flutter%20GIS" class="btn-primary" target="_blank">
+                💬 Asegurar Mi Cupo Ahora
+            </a>
+        </div>
+    </section>
+
+    <a href="https://wa.me/59167145303?text=Hola%20Daniel!%20Tengo%20preguntas%20sobre%20los%20cursos" class="whatsapp-float" target="_blank" aria-label="Contactar por WhatsApp">
+        💬
+    </a>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logos">
+                <img src="https://arte-tecnologias.com/IMG/logo/logo-artec.png" alt="ARTEC" class="footer-logo">
+            </div>
+            <p><strong>Cursos creados por:</strong> Daniel Quisbert</p>
+            <p><strong>En colaboración con:</strong> ARTEC - Centro de Capacitación</p>
+            
+            <div class="social-links">
+                <a href="https://www.youtube.com/@danielquisbert" target="_blank" class="social-link" title="YouTube">📺</a>
+                <a href="https://www.tiktok.com/@danielquisbertc" target="_blank" class="social-link" title="TikTok">🎵</a>
+                <a href="https://www.facebook.com/danielquisbert" target="_blank" class="social-link" title="Facebook">📘</a>
+                <a href="https://www.instagram.com/danielquisbert" target="_blank" class="social-link" title="Instagram">📸</a>
+                <a href="https://www.linkedin.com/in/danielquisbert/" target="_blank" class="social-link" title="LinkedIn">💼</a>
+                <a href="https://github.com/danielquisbert" target="_blank" class="social-link" title="GitHub">💻</a>
+            </div>
+
+            <p style="margin-top: 1.5rem;">© 2025 Daniel Quisbert • Certificaciones avaladas por ARTEC</p>
+            <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+                <a href="https://arte-tecnologias.com" target="_blank" style="color: var(--accent-green); text-decoration: none;">www.arte-tecnologias.com</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const wasActive = item.classList.contains('active');
+                
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                
+                if (!wasActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                header.style.boxShadow = '0 5px 30px rgba(0, 0, 0, 0.3)';
+            } else {
+                header.style.boxShadow = 'none';
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>
